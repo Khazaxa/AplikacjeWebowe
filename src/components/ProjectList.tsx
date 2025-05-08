@@ -1,6 +1,6 @@
 import React from "react";
 import { Project } from "../models/Project";
-import ProjectItem from "./ProjectItem";
+import styles from "./ProjectList.module.css";
 
 interface ProjectListProps {
   projects: Project[];
@@ -14,14 +14,14 @@ const ProjectList: React.FC<ProjectListProps> = ({
   onDelete,
 }) => {
   return (
-    <div>
+    <div className={styles["project-list"]}>
       {projects.map((project) => (
-        <ProjectItem
-          key={project.id}
-          project={project}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
+        <div key={project.id} className={styles["project-item"]}>
+          <h3>{project.name}</h3>
+          <p>{project.description}</p>
+          <button onClick={() => onEdit(project)}>Edit</button>
+          <button onClick={() => onDelete(project.id)}>Delete</button>
+        </div>
       ))}
     </div>
   );
