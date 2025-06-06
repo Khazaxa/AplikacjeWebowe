@@ -1,39 +1,39 @@
-.project-list {
+.story-list {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
   margin-top: 20px;
 }
 
-.project-item {
+.story-item {
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 5px;
   padding: 15px;
-  width: 15vw;
+  width: calc(33.333% - 20px);
   box-sizing: border-box;
   text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.project-item:hover {
+.story-item:hover {
   transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.project-item h3 {
+.story-item h3 {
   margin: 0 0 10px;
   color: #333;
   font-size: 18px;
 }
 
-.project-item p {
+.story-item p {
   color: #666;
   font-size: 14px;
   margin-bottom: 15px;
 }
 
-.project-item button {
+.story-item button {
   background-color: #007bff;
   color: white;
   border: none;
@@ -43,6 +43,6 @@
   margin: 5px;
 }
 
-.project-item button:hover {
+.story-item button:hover {
   background-color: #0056b3;
 }

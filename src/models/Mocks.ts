@@ -48,22 +48,22 @@ export const mockTasks: Task[] = [
 export const mockUsers: User[] = [
   {
     id: "1",
-    name: "Admin User",
-    surname: "Admin",
+    name: "Jan",
+    surname: "Nowak",
     role: "admin",
     description: "Administrator with full access.",
   },
   {
     id: "2",
-    name: "Developer User",
-    surname: "Dev",
+    name: "Adam",
+    surname: "Małysz",
     role: "dev",
     description: "Developer with access to development tasks.",
   },
   {
     id: "3",
-    name: "DevOps User",
-    surname: "Ops",
+    name: "John",
+    surname: "Doe",
     role: "devops",
     description: "DevOps engineer with access to deployment tasks.",
   },

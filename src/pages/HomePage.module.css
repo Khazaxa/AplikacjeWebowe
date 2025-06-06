@@ -1,4 +1,18 @@
+#loggedUser {
+  text-align: right;
+  margin-top: 20px;
+  font-size: 18px;
+  color: #333;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+}
+
 .container {
+  position: relative;
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
