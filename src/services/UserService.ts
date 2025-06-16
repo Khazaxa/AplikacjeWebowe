@@ -1,36 +1,35 @@
 import { User } from "../models/User";
+import ApiClient from "../api/ApiClient";
 
-const STORAGE_KEY = "users";
+const api = new ApiClient("myapp");
 
 export class UserService {
-  static getAll(): User[] {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  }
+  static getAll = async (): Promise<User[]> => {
+    return api.get<User[]>("users");
+  };
 
-  static getById(id: string): User | undefined {
-    const users = this.getAll();
-    return users.find((user) => user.id === id);
-  }
+  static getById = async (id: string): Promise<User | undefined> => {
+    const all = await api.get<User[]>("users");
+    return all.find((u) => u.id === id);
+  };
 
-  static add(user: User): void {
-    const users = this.getAll();
-    users.push(user);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-  }
+  static add = async (user: User): Promise<User> => {
+    return api.post<User>("users", user);
+  };
 
-  static update(id: string, updatedUser: Partial<User>): void {
-    const users = this.getAll();
-    const index = users.findIndex((user) => user.id === id);
-    if (index !== -1) {
-      users[index] = { ...users[index], ...updatedUser };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-    }
-  }
+  static update = async (
+    id: string,
+    updatedUser: Partial<User>
+  ): Promise<User> => {
+    const all = await api.get<User[]>("users");
+    const user = all.find((u) => u.id === id);
+    if (!user) throw new Error("User not found");
 
-  static delete(id: string): void {
-    const users = this.getAll();
-    const filteredUsers = users.filter((user) => user.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredUsers));
-  }
+    const updated = { ...user, ...updatedUser };
+    return api.put<User>("users", id, updated);
+  };
+
+  static delete = async (id: string): Promise<void> => {
+    return api.delete<void>("users", id);
+  };
 }

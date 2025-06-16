@@ -1,36 +1,35 @@
 import { Story } from "../models/Story";
+import ApiClient from "../api/ApiClient";
 
-const STORAGE_KEY = "stories";
+const api = new ApiClient("myapp");
 
 export class StoryService {
-  static getAll(): Story[] {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  }
+  static getAll = async (): Promise<Story[]> => {
+    return api.get<Story[]>("stories");
+  };
 
-  static getById(id: string): Story | undefined {
-    const stories = this.getAll();
-    return stories.find((story) => story.id === id);
-  }
+  static getById = async (id: string): Promise<Story | undefined> => {
+    const all = await api.get<Story[]>("stories");
+    return all.find((s) => s.id === id);
+  };
 
-  static add(story: Story): void {
-    const stories = this.getAll();
-    stories.push(story);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
-  }
+  static add = async (story: Story): Promise<Story> => {
+    return api.post<Story>("stories", story);
+  };
 
-  static update(id: string, updatedStory: Partial<Story>): void {
-    const stories = this.getAll();
-    const index = stories.findIndex((story) => story.id === id);
-    if (index !== -1) {
-      stories[index] = { ...stories[index], ...updatedStory };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
-    }
-  }
+  static update = async (
+    id: string,
+    updatedStory: Partial<Story>
+  ): Promise<Story> => {
+    const all = await api.get<Story[]>("stories");
+    const story = all.find((s) => s.id === id);
+    if (!story) throw new Error("Story not found");
 
-  static delete(id: string): void {
-    const stories = this.getAll();
-    const filteredStories = stories.filter((story) => story.id !== id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredStories));
-  }
+    const updated = { ...story, ...updatedStory };
+    return api.put<Story>("stories", id, updated);
+  };
+
+  static delete = async (id: string): Promise<void> => {
+    return api.delete<void>("stories", id);
+  };
 }

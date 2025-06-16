@@ -10,21 +10,31 @@ import styles from "./HomePage.module.css";
 const HomePage: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [loggedUser, setLoggedUser] = useState<User | null>(null);
+  const [loggedUser, setLoggedUser] = useState<User | null | undefined>(null);
   const [allUsers, setAllUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    setProjects(ProjectService.getAllProjects());
+    async function fetchData() {
+      const projectsData = await ProjectService.getAllProjects();
+      setProjects(projectsData);
 
-    const storedUserId = localStorage.getItem("loggedUser");
-    const user = storedUserId ? UserService.getById(storedUserId) : null;
-    setLoggedUser(user || null);
+      const storedUserId = localStorage.getItem("loggedUser");
+      let user: User | null | undefined = null;
+      if (storedUserId) {
+        user = await UserService.getById(storedUserId);
+      }
+      setLoggedUser(user);
 
-    setAllUsers(UserService.getAll());
+      const usersData = await UserService.getAll();
+      setAllUsers(usersData);
+    }
+
+    fetchData();
   }, []);
 
-  const handleSave = () => {
-    setProjects(ProjectService.getAllProjects());
+  const handleSave = async () => {
+    const projectsData = await ProjectService.getAllProjects();
+    setProjects(projectsData);
     setEditingProject(null);
   };
 
@@ -32,13 +42,14 @@ const HomePage: React.FC = () => {
     setEditingProject(project);
   };
 
-  const handleDelete = (id: string) => {
-    ProjectService.deleteProject(id);
-    setProjects(ProjectService.getAllProjects());
+  const handleDelete = async (id: string) => {
+    await ProjectService.deleteProject(id);
+    const projectsData = await ProjectService.getAllProjects();
+    setProjects(projectsData);
   };
 
-  const handleUserChange = (userId: string) => {
-    const user = UserService.getById(userId);
+  const handleUserChange = async (userId: string) => {
+    const user = await UserService.getById(userId);
     if (user) {
       localStorage.setItem("loggedUser", userId);
       setLoggedUser(user);
@@ -66,6 +77,7 @@ const HomePage: React.FC = () => {
           ))}
         </select>
       </div>
+
       <h1>Project Management</h1>
       <div className={styles["project-list"]}>
         <ProjectList
@@ -74,6 +86,7 @@ const HomePage: React.FC = () => {
           onDelete={handleDelete}
         />
       </div>
+
       <h2>{editingProject ? "Edit Project" : "Add Project"}</h2>
       <div className={styles["project-form"]}>
         <ProjectForm

@@ -13,11 +13,10 @@ const ProjectPage: React.FC = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [editingStory, setEditingStory] = useState<Story | null>(null);
 
-  const fetchStories = () => {
+  const fetchStories = async () => {
     if (id) {
-      const projectStories = StoryService.getAll().filter(
-        (story) => story.project === id
-      );
+      const allStories = await StoryService.getAll();
+      const projectStories = allStories.filter((story) => story.project === id);
       setStories(projectStories);
     }
   };
@@ -26,8 +25,8 @@ const ProjectPage: React.FC = () => {
     fetchStories();
   }, [id]);
 
-  const handleSave = () => {
-    fetchStories();
+  const handleSave = async () => {
+    await fetchStories();
     setEditingStory(null);
   };
 
@@ -35,14 +34,14 @@ const ProjectPage: React.FC = () => {
     setEditingStory(story);
   };
 
-  const handleDelete = (storyId: string) => {
-    StoryService.delete(storyId);
-    fetchStories();
+  const handleDelete = async (storyId: string) => {
+    await StoryService.delete(storyId);
+    await fetchStories();
   };
 
-  const handleStatusChange = (updatedStory: Story) => {
-    StoryService.update(updatedStory.id, { state: updatedStory.state });
-    fetchStories();
+  const handleStatusChange = async (updatedStory: Story) => {
+    await StoryService.update(updatedStory.id, { state: updatedStory.state });
+    await fetchStories();
   };
 
   const handleGoBack = () => {

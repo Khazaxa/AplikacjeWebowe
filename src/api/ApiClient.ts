@@ -27,58 +27,48 @@ class ApiClient {
     return headers;
   }
 
+  private getStorageKey(endpoint: string) {
+    return `${this.baseUrl}_${endpoint}`;
+  }
+
   async get<T>(endpoint: string): Promise<T> {
-    const res = await fetch(`${this.baseUrl}${endpoint}`, {
-      method: "GET",
-      headers: this.getHeaders(),
-    });
-
-    if (!res.ok) {
-      throw new Error(`GET ${endpoint} failed with status ${res.status}`);
+    const key = this.getStorageKey(endpoint);
+    const data = localStorage.getItem(key);
+    if (!data) {
+      return [] as unknown as T;
     }
+    return JSON.parse(data) as T;
+  }
 
-    return res.json();
+  async getById<T>(endpoint: string, id: string): Promise<T | undefined> {
+    const items = await this.get<T[]>(endpoint);
+    return items.find((item: any) => item.id === id);
   }
 
   async post<T>(endpoint: string, body: any): Promise<T> {
-    const res = await fetch(`${this.baseUrl}${endpoint}`, {
-      method: "POST",
-      headers: this.getHeaders(),
-      body: JSON.stringify(body),
-    });
-
-    if (!res.ok) {
-      throw new Error(`POST ${endpoint} failed with status ${res.status}`);
-    }
-
-    return res.json();
+    const key = this.getStorageKey(endpoint);
+    const data = localStorage.getItem(key);
+    const items = data ? JSON.parse(data) : [];
+    items.push(body);
+    localStorage.setItem(key, JSON.stringify(items));
+    return body as T;
   }
 
-  async put<T>(endpoint: string, body: any): Promise<T> {
-    const res = await fetch(`${this.baseUrl}${endpoint}`, {
-      method: "PUT",
-      headers: this.getHeaders(),
-      body: JSON.stringify(body),
-    });
-
-    if (!res.ok) {
-      throw new Error(`PUT ${endpoint} failed with status ${res.status}`);
-    }
-
-    return res.json();
+  async put<T>(endpoint: string, id: string, body: any): Promise<T> {
+    const key = this.getStorageKey(endpoint);
+    const data = localStorage.getItem(key);
+    let items = data ? JSON.parse(data) : [];
+    items = items.map((item: any) => (item.id === id ? body : item));
+    localStorage.setItem(key, JSON.stringify(items));
+    return body as T;
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
-    const res = await fetch(`${this.baseUrl}${endpoint}`, {
-      method: "DELETE",
-      headers: this.getHeaders(),
-    });
-
-    if (!res.ok) {
-      throw new Error(`DELETE ${endpoint} failed with status ${res.status}`);
-    }
-
-    return res.json();
+  async delete<T>(endpoint: string, id: string): Promise<void> {
+    const key = this.getStorageKey(endpoint);
+    const data = localStorage.getItem(key);
+    const items = data ? JSON.parse(data) : [];
+    const filtered = items.filter((item: any) => item.id !== id);
+    localStorage.setItem(key, JSON.stringify(filtered));
   }
 }
 
