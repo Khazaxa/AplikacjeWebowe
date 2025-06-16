@@ -3,8 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Story } from "../models/Story";
 import { StoryService } from "../services/StoryService";
 import styles from "./ProjectPage.module.css";
-import StoryList from "../components/StoryList";
 import StoryForm from "../components/StoryForm";
+import StoryBoard from "../components/StoryBoard";
 
 const ProjectPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,23 +13,22 @@ const ProjectPage: React.FC = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [editingStory, setEditingStory] = useState<Story | null>(null);
 
-  useEffect(() => {
+  const fetchStories = () => {
     if (id) {
       const projectStories = StoryService.getAll().filter(
         (story) => story.project === id
       );
       setStories(projectStories);
     }
+  };
+
+  useEffect(() => {
+    fetchStories();
   }, [id]);
 
   const handleSave = () => {
-    if (id) {
-      const projectStories = StoryService.getAll().filter(
-        (story) => story.project === id
-      );
-      setStories(projectStories);
-      setEditingStory(null);
-    }
+    fetchStories();
+    setEditingStory(null);
   };
 
   const handleEdit = (story: Story) => {
@@ -38,12 +37,12 @@ const ProjectPage: React.FC = () => {
 
   const handleDelete = (storyId: string) => {
     StoryService.delete(storyId);
-    if (id) {
-      const projectStories = StoryService.getAll().filter(
-        (story) => story.project === id
-      );
-      setStories(projectStories);
-    }
+    fetchStories();
+  };
+
+  const handleStatusChange = (updatedStory: Story) => {
+    StoryService.update(updatedStory.id, { state: updatedStory.state });
+    fetchStories();
   };
 
   const handleGoBack = () => {
@@ -63,14 +62,17 @@ const ProjectPage: React.FC = () => {
       <div className={styles.actions}>
         <button onClick={handleGoBack}>Go Back</button>
       </div>
+
       <h1>Story Management</h1>
       <div className={styles["story-list"]}>
-        <StoryList
+        <StoryBoard
           stories={stories}
           onEdit={handleEdit}
           onDelete={handleDelete}
+          onStatusChange={handleStatusChange}
         />
       </div>
+
       <h2>{editingStory ? "Edit Story" : "Add Story"}</h2>
       <div className={styles["story-form"]}>
         <StoryForm
