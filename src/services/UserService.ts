@@ -1,5 +1,5 @@
 import { User } from "../models/User";
-import ApiClient from "../api/ApiClient";
+import ApiClient from "../config/ApiClient";
 
 const api = new ApiClient("myapp");
 

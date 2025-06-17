@@ -13,6 +13,7 @@ interface StoryBoardProps {
   onEdit: (story: Story) => void;
   onDelete: (id: string) => void;
   onStatusChange: (updatedStory: Story) => void;
+  onViewDetails: (storyId: string) => void;
 }
 
 const columns = ["TODO", "IN PROGRESS", "DONE"] as const;
@@ -23,6 +24,7 @@ const StoryBoard: React.FC<StoryBoardProps> = ({
   onEdit,
   onDelete,
   onStatusChange,
+  onViewDetails,
 }) => {
   const grouped: Record<ColumnType, Story[]> = {
     TODO: [],
@@ -81,6 +83,9 @@ const StoryBoard: React.FC<StoryBoardProps> = ({
                       >
                         <h3>{story.name}</h3>
                         <p>{story.description}</p>
+                        <button onClick={() => onViewDetails(story.id)}>
+                          View Details
+                        </button>
                         <button onClick={() => onEdit(story)}>Edit</button>
                         <button onClick={() => onDelete(story.id)}>
                           Delete

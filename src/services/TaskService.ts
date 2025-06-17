@@ -1,5 +1,5 @@
 import { Task } from "../models/Task";
-import ApiClient from "../api/ApiClient";
+import ApiClient from "../config/ApiClient";
 
 const api = new ApiClient("myapp");
 

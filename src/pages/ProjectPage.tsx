@@ -48,6 +48,10 @@ const ProjectPage: React.FC = () => {
     navigate("/");
   };
 
+  const handleViewDetails = (storyId: string) => {
+    navigate(`/story/${storyId}`);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -69,6 +73,7 @@ const ProjectPage: React.FC = () => {
           onEdit={handleEdit}
           onDelete={handleDelete}
           onStatusChange={handleStatusChange}
+          onViewDetails={handleViewDetails}
         />
       </div>
 

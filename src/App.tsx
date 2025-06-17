@@ -1,20 +1,32 @@
-import { useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import "./App.css";
+import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import HomePage from "./pages/HomePage";
 import ProjectPage from "./pages/ProjectPage";
-import { initializeMockData } from "./services/InitializeMockData";
+import StoryDetails from "./components/StoryDetails";
+import { Register } from "./components/Register";
+import { Login } from "./components/Login";
 
 function App() {
-  useEffect(() => {
-    initializeMockData();
-  }, []);
+  const [register, setRegister] = useState(true);
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={
+            register ? (
+              <Login setRegister={setRegister} />
+            ) : (
+              <Register setRegister={setRegister} />
+            )
+          }
+        />
+        <Route path="/home" element={<HomePage />} />
         <Route path="/project/:id" element={<ProjectPage />} />
+        <Route path="/story/:id" element={<StoryDetails />} />
+        <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
     </Router>
   );
