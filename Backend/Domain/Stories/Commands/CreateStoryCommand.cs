@@ -18,6 +18,10 @@ internal class CreateStoryCommandHandler(
         if(string.IsNullOrEmpty(request.Params.Name))
             throw new DomainException("Name is required.", (int)CommonErrorCode.InvalidOperation);
         
+        if(await storyRepository.AnyAsync(
+               s => s.Name == request.Params.Name, cancellationToken))
+            throw new DomainException("Story with this name already exists.", (int)CommonErrorCode.InvalidOperation);
+        
         var story = new Story(
             request.Params.Name,
             request.Params.Description,

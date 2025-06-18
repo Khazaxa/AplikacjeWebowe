@@ -18,6 +18,10 @@ internal class CreateProjectCommandHandler(
         if(string.IsNullOrEmpty(request.Params.Name))
             throw new DomainException("Name is required.", (int)CommonErrorCode.InvalidOperation);
         
+        if(await projectRepository.AnyAsync(
+               s => s.Name == request.Params.Name, cancellationToken))
+            throw new DomainException("Project with this name already exists.", (int)CommonErrorCode.InvalidOperation);
+        
         var project = new Project(
             request.Params.Name, 
             request.Params.Description);

@@ -18,6 +18,10 @@ internal class CreateTaskCommandHandler(
         if(string.IsNullOrEmpty(request.Params.Name))
             throw new DomainException("Name is required.", (int)CommonErrorCode.InvalidOperation);
         
+        if(await taskRepository.AnyAsync(
+               s => s.Name == request.Params.Name, cancellationToken))
+            throw new DomainException("Task with this name already exists.", (int)CommonErrorCode.InvalidOperation);
+        
         var task = new Task(
             request.Params.Name,
             request.Params.Description,
