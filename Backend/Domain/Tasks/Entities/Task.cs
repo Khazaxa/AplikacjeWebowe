@@ -10,6 +10,23 @@ public class Task : EntityBase
 {
     private Task() { }
     
+    public Task(
+        string name, 
+        string? description = null, 
+        Priority? priority = null, 
+        int? storyId = null, 
+        DateTime? estimatedCompletionDate = null, 
+        State? state = null, 
+        int? userId = null)
+    {
+        Name = name;
+        Description = description;
+        Priority = priority;
+        StoryId = storyId;
+        EstimatedCompletionDate = estimatedCompletionDate;
+        State = state;
+        UserId = userId;
+    }
     
     public string? Name { get; private set; }
     public string? Description { get; private set; }
@@ -23,6 +40,24 @@ public class Task : EntityBase
     public DateTime? EndDate { get; private set; } = DateTime.UtcNow;
     public int? UserId { get; private set; }
     public User? User { get; private set; }
+    
+    public void Update(
+        string? name = null, 
+        string? description = null, 
+        Priority? priority = null, 
+        int? storyId = null, 
+        DateTime? estimatedCompletionDate = null, 
+        State? state = null, 
+        int? userId = null)
+    {
+        Name = name ?? Name;
+        Description = description ?? Description;
+        Priority = priority ?? Priority;
+        StoryId = storyId ?? StoryId;
+        EstimatedCompletionDate = estimatedCompletionDate ?? EstimatedCompletionDate;
+        State = state ?? State;
+        UserId = userId ?? UserId;
+    }
     
     public static void OnModelCreating(ModelBuilder builder)
     {

@@ -1,5 +1,7 @@
 using Core.CQRS;
 using Core.Database;
+using Core.Middlewares;
+using Domain.Tasks.Repositories;
 using MediatR;
 
 namespace Domain.Tasks.Commands;
@@ -7,19 +9,17 @@ namespace Domain.Tasks.Commands;
 public record DeleteTaskCommand(int Id) : ICommand<Unit>;
 
 internal class DeleteTaskCommandHandler(
+    ITaskRepository taskRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<DeleteTaskCommand, Unit>
 {
     public async Task<Unit> Handle(DeleteTaskCommand request, CancellationToken cancellationToken)
     {
-        // Logic to delete the Task by request.Id
-        // For example:
-        // var Task = await unitOfWork.Stories.FindAsync(request.Id);
-        // if (Task != null)
-        // {
-        //     unitOfWork.Stories.Remove(Task);
-        // }
+        var task = await taskRepository.FindAsync(request.Id, cancellationToken)
+            ?? throw new DomainException("Task not found.", (int)CommonErrorCode.InvalidOperation);
 
+        taskRepository.Delete(task);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        
         return Unit.Value;
     }
 }

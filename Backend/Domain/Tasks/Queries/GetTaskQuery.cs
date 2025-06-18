@@ -1,32 +1,33 @@
 using Core.CQRS;
 using Core.Database;
+using Core.Middlewares;
 using Domain.Stories.Enums;
 using Domain.Tasks.Dto;
+using Domain.Tasks.Repositories;
 
 namespace Domain.Tasks.Queries;
 
 public record GetTaskQuery(int Id) : IQuery<TaskDto>;
 
 internal class GetTaskQueryHandler(
-    IUnitOfWork unitOfWork) : IQueryHandler<GetTaskQuery, TaskDto>
+    ITaskRepository taskRepository) : IQueryHandler<GetTaskQuery, TaskDto>
 {
     public async Task<TaskDto> Handle(GetTaskQuery request, CancellationToken cancellationToken)
     {
-        var task = new TaskDto(
-            Id: 1,
-            Name: "Task 1",
-            Description: "Description for Task 1",
-            Priority: Priority.High,
-            StoryId: 1,
-            EstimatedCompletionDate: DateTime.UtcNow.AddDays(5),
-            State: State.InProgress,
-            CreatedAt: DateTime.UtcNow,
-            StartedAt: DateTime.UtcNow.AddDays(1),
-            EndDate: DateTime.UtcNow.AddDays(4),
-            UserId: 1);
+        var task = await taskRepository.FindAsync(request.Id, cancellationToken) 
+            ?? throw new DomainException("Task not found.", (int)CommonErrorCode.InvalidOperation);
         
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        return task;
+        return new TaskDto(
+            task.Id,
+            task.Name,
+            task.Description,
+            task.Priority,
+            task.StoryId,
+            task.EstimatedCompletionDate,
+            task.State,
+            task.CreatedAt,
+            task.StartedAt,
+            task.EndDate,
+            task.UserId);
     }
 }

@@ -1,5 +1,7 @@
 using Core.CQRS;
 using Core.Database;
+using Core.Middlewares;
+using Domain.Stories.Repositories;
 using MediatR;
 
 namespace Domain.Stories.Commands;
@@ -7,19 +9,17 @@ namespace Domain.Stories.Commands;
 public record DeleteStoryCommand(int Id) : ICommand<Unit>;
 
 internal class DeleteStoryCommandHandler(
+    IStoryRepository storyRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<DeleteStoryCommand, Unit>
 {
     public async Task<Unit> Handle(DeleteStoryCommand request, CancellationToken cancellationToken)
     {
-        // Logic to delete the story by request.Id
-        // For example:
-        // var story = await unitOfWork.Stories.FindAsync(request.Id);
-        // if (story != null)
-        // {
-        //     unitOfWork.Stories.Remove(story);
-        // }
-
+        var story = await storyRepository.FindAsync(request.Id, cancellationToken)
+            ?? throw new DomainException("Story not found.", (int)CommonErrorCode.InvalidOperation);
+        
+        storyRepository.Delete(story);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        
         return Unit.Value;
     }
 }

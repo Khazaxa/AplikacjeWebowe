@@ -2,40 +2,27 @@ using Core.CQRS;
 using Core.Database;
 using Domain.Stories.Dto;
 using Domain.Stories.Enums;
+using Domain.Stories.Repositories;
 
 namespace Domain.Stories.Queries;
 
 public record GetStoriesQuery : IQuery<IQueryable<StoryDto>>;
 
 internal class GetStoriesQueryHandler(
-    IUnitOfWork unitOfWork) : IQueryHandler<GetStoriesQuery, IQueryable<StoryDto>>
+    IStoryRepository storyRepository) : IQueryHandler<GetStoriesQuery, IQueryable<StoryDto>>
 {
     public async Task<IQueryable<StoryDto>> Handle(GetStoriesQuery request, CancellationToken cancellationToken)
     {
-        var stories = new List<StoryDto>
-        {
-            new (
-                Id: 1,
-                Name: "Story 1",
-                Description: "Description for story 1",
-                Priority: Priority.Medium,
-                State: State.ToDo),
-            new (
-                Id: 2,
-                Name: "Story 2",
-                Description: "Description for story 2",
-                Priority: Priority.High,
-                State: State.InProgress),
-            new (
-                Id: 3,
-                Name: "Story 3",
-                Description: "Description for story 3",
-                Priority: Priority.Low,
-                State: State.Done)
-        };
+        var stories = storyRepository.Query()
+            .Select(s => new StoryDto
+            (
+                s.Id,
+                s.Name,
+                s.Description,
+                s.Priority,
+                s.State
+            ));
         
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        return stories.AsQueryable();
+        return stories;
     }
 }

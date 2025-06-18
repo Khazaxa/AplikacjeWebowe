@@ -1,32 +1,50 @@
 using Core.CQRS;
 using Core.Database;
+using Core.Middlewares;
 using Domain.Tasks.Dto;
+using Domain.Tasks.Repositories;
 
 namespace Domain.Tasks.Commands;
 
 public record UpdateTaskCommand(int Id, TaskParams @Params) : ICommand<TaskDto>;
 
 internal class UpdateTaskCommandHandler(
+    ITaskRepository taskRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<UpdateTaskCommand, TaskDto>
 {
     public async Task<TaskDto> Handle(UpdateTaskCommand request, CancellationToken cancellationToken)
     {
-        // Logic to update the Task by Id
-        // This is a placeholder implementation
-        var updatedTask = new TaskDto(
-            Id: request.Id,
-            Name: request.Params.Name,
-            Description: request.Params.Description,
-            Priority: request.Params.Priority,
-            StoryId: request.Params.StoryId,
-            EstimatedCompletionDate: request.Params.EstimatedCompletionDate,
-            State: request.Params.State,
-            CreatedAt: request.Params.CreatedAt,
-            StartedAt: request.Params.StartedAt,
-            EndDate: request.Params.EndDate,
-            UserId: request.Params.UserId);
-
+        var task = await taskRepository.FindAsync(request.Id, cancellationToken)
+            ?? throw new DomainException("Task not found.", (int)CommonErrorCode.InvalidOperation);
+        
+        task.Update(
+            request.Params.Name,
+            request.Params.Description,
+            request.Params.Priority,
+            request.Params.StoryId,
+            request.Params.EstimatedCompletionDate,
+            request.Params.State,
+            request.Params.UserId
+        );
+        
+        taskRepository.Update(task);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        var updatedTask = new TaskDto
+        (
+            task.Id,
+            task.Name,
+            task.Description,
+            task.Priority,
+            task.StoryId,
+            task.EstimatedCompletionDate,
+            task.State,
+            task.CreatedAt,
+            task.StartedAt,
+            task.EndDate,
+            task.UserId
+        );
+        
         return updatedTask;
     }
 }

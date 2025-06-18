@@ -10,6 +10,13 @@ public sealed class Story : EntityBase
 {
     private Story() { }
     
+    public Story(string name, string? description = null, Priority? priority = null, State? state = null)
+    {
+        Name = name;
+        Description = description;
+        Priority = priority;
+        State = state;
+    }
     
     public string? Name { get; private set; }
     public string? Description { get; private set; }
@@ -19,6 +26,20 @@ public sealed class Story : EntityBase
     public int? UserId { get; private set; }
     public User? User { get; private set; }
     public List<Task>? Tasks { get; private set; } = new ();
+    
+    public void Update(
+        string? name = null, 
+        string? description = null, 
+        Priority? priority = null, 
+        State? state = null, 
+        int? userId = null)
+    {
+        Name = name ?? Name;
+        Description = description ?? Description;
+        Priority = priority ?? Priority;
+        State = state ?? State;
+        UserId = userId ?? UserId;
+    }
     
     
     public static void OnModelCreating(ModelBuilder builder)

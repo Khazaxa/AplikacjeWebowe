@@ -1,25 +1,26 @@
 using Core.CQRS;
 using Core.Database;
+using Core.Middlewares;
 using Domain.Stories.Dto;
+using Domain.Stories.Repositories;
 
 namespace Domain.Stories.Queries;
 
 public record GetStoryQuery(int Id) : IQuery<StoryDto>;
 
 internal class GetStoryQueryHandler(
-    IUnitOfWork unitOfWork) : IQueryHandler<GetStoryQuery, StoryDto>
+    IStoryRepository storyRepository) : IQueryHandler<GetStoryQuery, StoryDto>
 {
     public async Task<StoryDto> Handle(GetStoryQuery request, CancellationToken cancellationToken)
     {
-        var story = new StoryDto(
-            Id: request.Id,
-            Name: "Sample Story",
-            Description: "This is a sample story description.",
-            Priority: Enums.Priority.High,
-            State: Enums.State.InProgress);
+        var story = await storyRepository.FindAsync(request.Id, cancellationToken) 
+                        ?? throw new DomainException("Story not found.", (int)CommonErrorCode.InvalidOperation);
         
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        return story;
+        return new StoryDto(
+            story.Id, 
+            story.Name, 
+            story.Description, 
+            story.Priority, 
+            story.State);
     }
 }

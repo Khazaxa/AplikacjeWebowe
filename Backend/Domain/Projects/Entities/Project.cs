@@ -7,9 +7,20 @@ public class Project : EntityBase
 {
     private Project() { }
     
+    public Project(string name, string? description = null)
+    {
+        Name = name;
+        Description = description;
+    }
     
     public string? Name { get; private set; }
     public string? Description { get; private set; }
+    
+    public void Update(string? name = null, string? description = null)
+    {
+        Name = name ?? Name;
+        Description = description ?? Description;
+    }
     
     public static void OnModelCreating(ModelBuilder builder)
     {
