@@ -21,7 +21,10 @@ public class DomainModule(IConfigurationRoot configuration) : Module
         builder.RegisterInstance(configuration).As<IConfigurationRoot>();
         builder.RegisterModule<Users.UsersModule>();
         builder.RegisterModule<Authentication.AuthenticationModule>();
-       
+        builder.RegisterModule<Stories.StoriesModule>();
+        builder.RegisterModule<Tasks.TasksModule>();
+        builder.RegisterModule<Projects.ProjectsModule>();
+        
         builder.RegisterType<Core.Database.UnitOfWork>().As<Core.Database.IUnitOfWork>().InstancePerLifetimeScope();
         
         RegisterDatabaseProviders(builder);
