@@ -43,6 +43,10 @@ export function Login({
       if (accessToken) {
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("userId", userId);
+        localStorage.setItem("email", email);
+
+        window.dispatchEvent(new Event("login"));
+
         navigate("/home");
       } else {
         showNotification("error", response.data.Message || "Login failed.");
@@ -64,7 +68,10 @@ export function Login({
     <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 transition-colors">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 ring ring-gray-900/5">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <h1 className="text-6xl font-bold text-center text-gray-800 dark:text-white mb-4">
+          <h1
+            className="text-6xl font-bold text-center mb-4"
+            style={{ color: "#74787F" }}
+          >
             Login
           </h1>
 

@@ -3,12 +3,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Home from "./components/Home";
 import AuthPage from "./components/AuthPage";
-import DarkModeToggle from "./components/DarkModeToggle";
+import LoggedUser from "./components/LoggedUser";
 
 function App() {
   return (
     <>
-      <DarkModeToggle />
+      <LoggedUser />
       <Router>
         <Routes>
           <Route path="/" element={<AuthPage />} />
