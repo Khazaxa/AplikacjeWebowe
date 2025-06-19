@@ -90,7 +90,6 @@ export function Register({
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 transition-colors">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        <Notifications messageType={messageType} message={message} />
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex justify-end">
             <button
@@ -189,6 +188,7 @@ export function Register({
             Register
           </button>
         </form>
+        <Notifications messageType={messageType} message={message} />
       </div>
     </div>
   );

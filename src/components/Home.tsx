@@ -1,8 +1,3 @@
-import AddBtn from "./Buttons/AddBtn";
-import DelBtn from "./Buttons/DelBtn";
-import DetailsBtn from "./Buttons/DetailsBtn";
-import EditBtn from "./Buttons/EditBtn";
-
 export default function Home() {
   return (
     <>
@@ -12,10 +7,6 @@ export default function Home() {
           This is the home page of your application.
         </p>
       </div>
-      <AddBtn onClick={() => console.log("Add button clicked")} />
-      <DelBtn onClick={() => console.log("Delete button clicked")} />
-      <EditBtn onClick={() => console.log("Edit button clicked")} />
-      <DetailsBtn onClick={() => console.log("Details button clicked")} />
     </>
   );
 }

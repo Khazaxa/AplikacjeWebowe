@@ -26,7 +26,7 @@ export function Login({
     setTimeout(() => {
       setMessage("");
       setMessageType(null);
-    }, 3000);
+    }, 1000);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -63,7 +63,6 @@ export function Login({
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 transition-colors">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 ring ring-gray-900/5">
-        <Notifications messageType={messageType} message={message} />
         <form onSubmit={handleSubmit} className="space-y-6">
           <h1 className="text-6xl font-bold text-center text-gray-800 dark:text-white mb-4">
             Login
@@ -115,6 +114,7 @@ export function Login({
             </button>
           </p>
         </form>
+        <Notifications messageType={messageType} message={message} />
       </div>
     </div>
   );
