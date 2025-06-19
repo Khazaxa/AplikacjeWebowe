@@ -26,7 +26,6 @@ export default function Home() {
         setProjects(res.data);
       })
       .catch((err) => {
-        console.error(err);
         setError("Failed to load projects.");
       })
       .finally(() => setLoading(false));
@@ -57,7 +56,6 @@ export default function Home() {
       await ProjectService.create(data);
       fetchProjects();
     } catch (err) {
-      console.error(err);
       setSubmitError("Failed to add project.");
     }
   };
@@ -70,10 +68,10 @@ export default function Home() {
       fetchProjects();
       setEditingProject(null);
     } catch (err) {
-      console.error(err);
       setSubmitError("Failed to update project.");
     }
   };
+
   const handleFormSubmit = async (data: Omit<Project, "id">) => {
     if (editingProject) {
       await handleEditSubmit(data);
@@ -81,6 +79,16 @@ export default function Home() {
       await handleAddProject(data);
     }
   };
+
+  const handleDeleteProject = async (id: number) => {
+    try {
+      await ProjectService.delete(id.toString());
+      fetchProjects();
+    } catch (err) {
+      setError("Failed to delete project.");
+    }
+  };
+
   return (
     <>
       <ExpandableForm
@@ -115,6 +123,7 @@ export default function Home() {
                   setEditingProject(projectToEdit);
                 }
               }}
+              onDelete={handleDeleteProject}
             />
           )}
         </div>
