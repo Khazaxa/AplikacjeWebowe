@@ -1,8 +1,10 @@
+import "./App.css";
 import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { Login } from "./components/Login";
 import { Register } from "./components/Register";
+import Home from "./components/Home";
 
 function App() {
   const [register, setRegister] = useState(true);
@@ -20,6 +22,7 @@ function App() {
             )
           }
         />
+        <Route path="/home" element={<Home />} />
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
     </Router>
