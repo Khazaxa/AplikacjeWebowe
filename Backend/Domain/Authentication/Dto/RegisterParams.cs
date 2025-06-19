@@ -1,3 +1,5 @@
+using Domain.Users.Enums;
+
 namespace Domain.Authentication.Dto;
 
 public record RegisterParams(
@@ -6,4 +8,5 @@ public record RegisterParams(
     string? Name,
     string? Surname,
     int? Age,
-    string? Description);
+    string? Description,
+    UserRole Role);

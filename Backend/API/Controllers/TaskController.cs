@@ -35,4 +35,19 @@ public class TaskController(IMediator mediator) : ControllerBase
     [Route("/Task/{id}")]
     public async Task DeleteTask(int id, CancellationToken cancellationToken)
         => await mediator.Send(new DeleteTaskCommand(id), cancellationToken);
+    
+    [HttpPut]
+    [Route("/task/{id}/start")]
+    public async Task StartTask(int id, CancellationToken cancellationToken)
+        => await mediator.Send(new StartTaskCommand(id), cancellationToken);
+    
+    [HttpPut]
+    [Route("/task/{id}/complete")]
+    public async Task CompleteTask(int id, CancellationToken cancellationToken)
+        => await mediator.Send(new CompleteTaskCommand(id), cancellationToken);
+    
+    [HttpPut]
+    [Route("/task/{id}/assign")]
+    public async Task AssignTask(int id, int userId, CancellationToken cancellationToken)
+        => await mediator.Send(new AssignTaskCommand(id, userId), cancellationToken);
 }

@@ -25,7 +25,7 @@ internal class RegisterCommandHandler(
             input.Email,
             hmac.ComputeHash(Encoding.UTF8.GetBytes(input.Password)),
             passwordSalt: hmac.Key,
-            UserRole.Admin,
+            input.Role,
             input.Name,
             input.Surname,
             input.Age,
