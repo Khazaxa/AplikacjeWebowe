@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ReturnBtn from "../Buttons/ReturnBtn";
 import ExpandableForm from "../ExpandableForm";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { TaskService } from "../../service/TaskService";
 import { StoryService } from "../../service/StoryService";
 import { Story } from "./ProjectDetails";
@@ -27,7 +27,6 @@ export default function StoryDetails() {
   const [story, setStory] = useState<Story | null>(null);
   const [loadingStory, setLoadingStory] = useState(false);
   const [storyError, setStoryError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [tasksError, setTasksError] = useState<string | null>(null);
@@ -142,18 +141,6 @@ export default function StoryDetails() {
     }
   };
 
-  async function handleStatusChange(taskId: number, newState: number) {
-    const task = tasks.find((t) => t.id === taskId);
-    if (!task) return;
-
-    try {
-      await TaskService.update(taskId.toString(), { ...task, state: newState });
-      await fetchTasks();
-    } catch {
-      setTasksError("Failed to update task state.");
-    }
-  }
-
   function priorityToString(priority: number): string {
     switch (priority) {
       case 0:
@@ -191,7 +178,17 @@ export default function StoryDetails() {
 
       <div className="relative min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 pt-6 px-6 transition-all duration-500 ease-in-out">
         <ReturnBtn />
-        <div className="bg-white dark:bg-gray-800 bg-opacity-80 dark:bg-opacity-70 rounded-lg p-6 max-w-4xl shadow-md text-center overflow-hidden transition-all duration-500 ease-in-out flex flex-col gap-6">
+        <div
+          className="
+    bg-white dark:bg-gray-800 bg-opacity-80 dark:bg-opacity-70
+    rounded-lg shadow-md text-center overflow-hidden
+    transition-all duration-500 ease-in-out flex flex-col gap-6
+    max-w-6xl w-full
+    px-6 sm:px-8 lg:px-12
+    py-8
+  "
+          style={{ minWidth: 0 }}
+        >
           <section>
             {loadingStory && (
               <p className="text-lg text-gray-500 dark:text-gray-400">
@@ -239,13 +236,9 @@ export default function StoryDetails() {
             <>
               <KanbanBoard
                 tasks={tasks.filter((task) => [0, 1, 2].includes(task.state))}
-                onStatusChange={handleStatusChange}
                 onEditTask={(id) => {
                   const task = tasks.find((t) => t.id === id);
                   if (task) setEditingTask(task);
-                }}
-                onViewTaskDetails={(id) => {
-                  navigate(`/task/${id}`);
                 }}
                 onDeleteTask={handleDeleteTask}
               />

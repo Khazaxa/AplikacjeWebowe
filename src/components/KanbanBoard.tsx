@@ -1,52 +1,39 @@
 import React from "react";
-import {
-  DndContext,
-  closestCenter,
-  useDroppable,
-  useDraggable,
-} from "@dnd-kit/core";
-import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { Task } from "./Details/StoryDetails";
 import DetailsBtn from "./Buttons/DetailsBtn";
 import EditBtn from "./Buttons/EditBtn";
 import DelBtn from "./Buttons/DelBtn";
 import { useNavigate } from "react-router-dom";
 
-interface KanbanBoardProps {
+interface KanbanViewProps {
   tasks: Task[];
-  onStatusChange: (taskId: number, newState: number) => void;
   onEditTask: (taskId: number) => void;
-  onViewTaskDetails?: (taskId: number) => void;
   onDeleteTask: (taskId: number) => void;
 }
 
 const columns = [
-  { id: 0, title: "To Do" },
-  { id: 1, title: "In Progress" },
-  { id: 2, title: "Done" },
+  { id: "ToDo", title: "To Do", bgColor: "bg-indigo-50 dark:bg-indigo-900" },
+  {
+    id: "InProgress",
+    title: "In Progress",
+    bgColor: "bg-yellow-50 dark:bg-yellow-900",
+  },
+  { id: "Done", title: "Done", bgColor: "bg-green-50 dark:bg-green-900" },
 ];
 
-function DroppableColumn({
-  columnId,
+function Column({
   title,
+  bgColor,
   children,
 }: {
-  columnId: number;
+  columnId: string;
   title: string;
+  bgColor: string;
   children: React.ReactNode;
 }) {
-  const { setNodeRef } = useDroppable({ id: columnId.toString() });
-
-  const columnColors: Record<number, string> = {
-    0: "bg-indigo-50 dark:bg-indigo-900",
-    1: "bg-yellow-50 dark:bg-yellow-900",
-    2: "bg-green-50 dark:bg-green-900",
-  };
-
   return (
     <div
-      ref={setNodeRef}
-      className={`w-full md:w-1/3 p-2 rounded shadow-sm ${columnColors[columnId]} min-h-[400px]`}
+      className={`w-full md:w-1/3 p-2 rounded shadow-sm ${bgColor} min-h-[400px]`}
     >
       <div className="text-center font-semibold mb-2 text-lg md:text-xl">
         {title}
@@ -56,38 +43,27 @@ function DroppableColumn({
   );
 }
 
-function DraggableTask({
+function TaskCard({
   task,
   onEdit,
-  onDetails,
   onDelete,
 }: {
   task: Task;
   onEdit: (taskId: number) => void;
-  onDetails: (taskId: number) => void;
   onDelete: (taskId: number) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: task.id.toString(),
-  });
+  const navigate = useNavigate();
 
   return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      style={{
-        transform: transform
-          ? `translate(${transform.x}px, ${transform.y}px)`
-          : undefined,
-      }}
-      className="p-2 bg-white dark:bg-gray-800 rounded shadow cursor-grab text-gray-900 dark:text-gray-100"
-    >
+    <div className="p-2 bg-white dark:bg-gray-800 rounded shadow cursor-default text-gray-900 dark:text-gray-100">
       <p className="font-medium">{task.name}</p>
       <p className="text-sm mb-2">{task.description}</p>
 
       <div className="flex flex-col gap-1 items-center">
-        <DetailsBtn onClick={() => onDetails(task.id)} aria-label="Details" />
+        <DetailsBtn
+          onClick={() => navigate(`/task/${task.id}`)}
+          aria-label="Details"
+        />
         <EditBtn onClick={() => onEdit(task.id)} aria-label="Edit" />
         <DelBtn onClick={() => onDelete(task.id)} aria-label="Delete" />
       </div>
@@ -95,32 +71,11 @@ function DraggableTask({
   );
 }
 
-export default function KanbanBoard({
+export default function KanbanView({
   tasks,
-  onStatusChange,
   onEditTask,
   onDeleteTask,
-}: KanbanBoardProps) {
-  const navigate = useNavigate();
-
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event;
-
-    if (!over) return;
-
-    const taskId = parseInt(active.id);
-    const newState = parseInt(over.id);
-
-    const task = tasks.find((t) => t.id === taskId);
-    if (task && task.state !== newState) {
-      onStatusChange(taskId, newState);
-    }
-  };
-
-  const handleViewDetails = (taskId: number) => {
-    navigate(`/task/${taskId}`);
-  };
-
+}: KanbanViewProps) {
   const handleEdit = (taskId: number) => {
     onEditTask(taskId);
   };
@@ -129,29 +84,40 @@ export default function KanbanBoard({
     onDeleteTask(taskId);
   };
 
+  const stateToColumnId = (state: number): string => {
+    switch (state) {
+      case 1:
+        return "ToDo";
+      case 2:
+        return "InProgress";
+      case 3:
+        return "Done";
+      default:
+        return "ToDo";
+    }
+  };
+
   return (
-    <DndContext
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-      modifiers={[restrictToParentElement]}
-    >
-      <div className="flex flex-col md:flex-row gap-4 mt-6">
-        {columns.map((col) => (
-          <DroppableColumn key={col.id} columnId={col.id} title={col.title}>
-            {tasks
-              .filter((task) => task.state === col.id)
-              .map((task) => (
-                <DraggableTask
-                  key={task.id}
-                  task={task}
-                  onEdit={handleEdit}
-                  onDetails={handleViewDetails}
-                  onDelete={handleDelete}
-                />
-              ))}
-          </DroppableColumn>
-        ))}
-      </div>
-    </DndContext>
+    <div className="flex flex-col md:flex-row gap-4 mt-6">
+      {columns.map((col) => (
+        <Column
+          key={col.id}
+          columnId={col.id}
+          title={col.title}
+          bgColor={col.bgColor}
+        >
+          {tasks
+            .filter((task) => stateToColumnId(task.state) === col.id)
+            .map((task) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+        </Column>
+      ))}
+    </div>
   );
 }
