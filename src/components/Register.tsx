@@ -14,6 +14,7 @@ export function Register({
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [description, setDescription] = useState("");
+  const [role, setRole] = useState(3);
 
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
@@ -23,7 +24,13 @@ export function Register({
   const [messageType, setMessageType] = useState<
     "success" | "error" | "warning" | null
   >(null);
-  const notificationDelay = () => {
+
+  const showNotification = (
+    type: "success" | "error" | "warning",
+    msg: string
+  ) => {
+    setMessageType(type);
+    setMessage(msg);
     setTimeout(() => {
       setMessage("");
       setMessageType(null);
@@ -38,46 +45,43 @@ export function Register({
     event.preventDefault();
 
     if (!emailRegex.test(email)) {
-      setMessage("Invalid email address");
-      setMessageType("error");
-      notificationDelay();
-    } else if (validatePassword(password) === false) {
-      setMessage(
+      showNotification("error", "Invalid email address");
+    } else if (!validatePassword(password)) {
+      showNotification(
+        "error",
         "Password must contain at least 6 characters, including uppercase, lowercase, number and special character"
       );
-      setMessageType("error");
-      notificationDelay();
     } else if (password !== password2) {
-      setMessage("Passwords do not match");
-      setMessageType("error");
-      notificationDelay();
+      showNotification("error", "Passwords do not match");
     } else {
       try {
         const response = await api.post("/auth/register", {
-          email: email,
-          name: name,
-          surname: surname,
-          age: age,
-          password: password,
-          confirmPassword: password2,
-          description: description,
+          email,
+          password,
+          name,
+          surname,
+          age,
+          description,
+          role,
         });
 
         if (response.status === 200) {
+          showNotification("success", "Registration successful.");
           setRegister(true);
-          setMessage("Registration succesfull.");
-          setMessageType("success");
-          notificationDelay();
         } else {
-          setMessage("Registration failed. Please try again.");
-          setMessageType("error");
-          notificationDelay();
+          showNotification("error", "Registration failed. Please try again.");
           setRegister(false);
         }
-      } catch {
-        setMessage("Registration failed. Please try again.");
-        setMessageType("error");
-        notificationDelay();
+      } catch (error: any) {
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.Message
+        ) {
+          showNotification("error", error.response.data.Message);
+        } else {
+          showNotification("error", "Registration failed. Please try again.");
+        }
         setRegister(false);
       }
     }
@@ -104,12 +108,13 @@ export function Register({
         />
         <input
           id="surname"
-          placeholder="surname"
+          placeholder="Surname"
           onChange={(e) => setSurname(e.target.value)}
           required
         />
         <input
           id="age"
+          type="number"
           placeholder="Age"
           onChange={(e) => setAge(Number(e.target.value))}
           required
@@ -130,10 +135,19 @@ export function Register({
         />
         <input
           id="description"
-          placeholder="description"
+          placeholder="Description"
           onChange={(e) => setDescription(e.target.value)}
           required
         />
+        <select
+          id="role"
+          onChange={(e) => setRole(Number(e.target.value))}
+          required
+        >
+          <option value={3}>Dev</option>
+          <option value={1}>Admin</option>
+          <option value={2}>Devops</option>
+        </select>
         <button type="submit">Register</button>
       </form>
     </div>

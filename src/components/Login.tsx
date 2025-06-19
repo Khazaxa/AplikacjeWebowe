@@ -45,13 +45,18 @@ export function Login({
         localStorage.setItem("userId", userId);
         navigate("/home");
       } else {
-        showNotification(
-          "error",
-          "Login failed. Please check your credentials."
-        );
+        showNotification("error", response.data.Message || "Login failed.");
       }
-    } catch (error) {
-      showNotification("error", "Authentication failed. Please try again.");
+    } catch (error: any) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.Message
+      ) {
+        showNotification("error", error.response.data.Message);
+      } else {
+        showNotification("error", "Authentication failed. Please try again.");
+      }
     }
   };
 
