@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Field } from "../models/IField";
 
-interface FormProps<T> {
+export interface FormProps<T> {
   fields: Field[];
-  initialData?: Partial<T>;
   onSubmit: (data: T) => void;
-  onClear?: () => void;
+  onClear: () => void;
+  initialData?: Partial<T>;
+  children?: (disabled: boolean) => React.ReactNode;
 }
 
 export default function Form<T>({
@@ -13,6 +14,7 @@ export default function Form<T>({
   initialData = {} as Partial<T>,
   onSubmit,
   onClear,
+  children,
 }: FormProps<T>) {
   const [formData, setFormData] = useState<Partial<T>>(initialData);
 
@@ -24,7 +26,6 @@ export default function Form<T>({
     const { name, value, type } = e.target;
 
     let newValue: any = value;
-
     if (type === "number" || type === "select") newValue = Number(value);
     else if (type === "date") newValue = new Date(value);
 
@@ -116,21 +117,23 @@ export default function Form<T>({
         </div>
       ))}
 
-      <div className="flex justify-center gap-4">
-        <button
-          type="submit"
-          disabled={isFormEmpty}
-          className={`px-4 py-2 bg-blue-600 text-white rounded transition
-            ${
-              isFormEmpty
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-blue-700"
-            }`}
-        >
-          Add
-        </button>
+      {children ? (
+        children(isFormEmpty)
+      ) : (
+        <div className="flex justify-center gap-4 mt-4">
+          <button
+            type="submit"
+            disabled={isFormEmpty}
+            className={`px-4 py-2 bg-blue-600 text-white rounded transition
+              ${
+                isFormEmpty
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-blue-700"
+              }`}
+          >
+            Add
+          </button>
 
-        {onClear && (
           <button
             type="button"
             onClick={() => {
@@ -139,16 +142,16 @@ export default function Form<T>({
             }}
             disabled={isFormEmpty}
             className={`px-4 py-2 bg-red-600 text-white rounded transition 
-              ${
-                isFormEmpty
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-red-700"
-              }`}
+                ${
+                  isFormEmpty
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-red-700"
+                }`}
           >
             Clear
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </form>
   );
 }

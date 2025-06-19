@@ -2,8 +2,8 @@ import { Field } from "./IField";
 import { UserRole } from "./UserRole";
 
 export const registerFields: Field[] = [
-  { name: "email", label: "Email", type: "email", required: true },
-  { name: "password", label: "Password", type: "password", required: true },
+  { name: "email", label: "Email", type: "text", required: true },
+  { name: "password", label: "Password", type: "text", required: true },
   { name: "name", label: "Name", type: "text" },
   { name: "surname", label: "Surname", type: "text" },
   { name: "age", label: "Age", type: "number" },
@@ -12,6 +12,8 @@ export const registerFields: Field[] = [
     name: "role",
     label: "Role",
     type: "select",
-    options: Object.values(UserRole).map(String),
+    options: Object.entries(UserRole)
+      .filter(([, value]) => typeof value === "number")
+      .map(([key, value]) => ({ label: key, value: value as number })),
   },
 ];
