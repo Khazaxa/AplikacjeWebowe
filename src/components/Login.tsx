@@ -47,7 +47,7 @@ export function Login({
 
         window.dispatchEvent(new Event("login"));
 
-        navigate("/home");
+        navigate("/projects");
       } else {
         showNotification("error", response.data.Message || "Login failed.");
       }

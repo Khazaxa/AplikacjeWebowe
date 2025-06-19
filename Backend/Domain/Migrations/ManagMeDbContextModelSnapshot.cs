@@ -190,7 +190,8 @@ namespace Domain.Migrations
                 {
                     b.HasOne("Domain.Projects.Entities.Project", "Project")
                         .WithMany("Stories")
-                        .HasForeignKey("ProjectId");
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Domain.Users.Entities.User", "User")
                         .WithMany("Stories")
@@ -213,7 +214,8 @@ namespace Domain.Migrations
 
                     b.HasOne("Domain.Stories.Entities.Story", "Story")
                         .WithMany("Tasks")
-                        .HasForeignKey("StoryId");
+                        .HasForeignKey("StoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Assigned");
 

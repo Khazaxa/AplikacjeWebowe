@@ -32,7 +32,6 @@ internal class CreateTaskCommandHandler(
             request.Params.EstimatedCompletionDate,
             request.Params.State,
             request.Params.AssignedToId,
-            request.Params.CreatedAt,
             userContext.GetUserId());
         
         taskRepository.Add(task);

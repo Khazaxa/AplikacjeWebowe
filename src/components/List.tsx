@@ -7,8 +7,9 @@ interface Item {
   id: number;
   name: string;
   description?: string;
-  priority?: number;
-  state?: number;
+  priority?: string | number;
+  state?: string | number;
+  projectId?: number;
 }
 
 interface ListProps {

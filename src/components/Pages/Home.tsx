@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import ExpandableForm from "./ExpandableForm";
-import List from "./List";
-import Notifications from "./Notifications";
-import { ProjectService } from "../service/ProjectService";
+import ExpandableForm from "../ExpandableForm";
+import List from "../List";
+import Notifications from "../Notifications";
+import { ProjectService } from "../../service/ProjectService";
 
-interface Project {
+export interface Project {
   id: number;
   name: string;
   description: string;
@@ -25,7 +25,7 @@ export default function Home() {
       .then((res) => {
         setProjects(res.data);
       })
-      .catch((err) => {
+      .catch(() => {
         setError("Failed to load projects.");
       })
       .finally(() => setLoading(false));

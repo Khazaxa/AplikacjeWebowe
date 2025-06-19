@@ -1,15 +1,8 @@
 export interface Field {
   name: string;
   label: string;
-  type:
-    | "text"
-    | "email"
-    | "password"
-    | "number"
-    | "date"
-    | "select"
-    | "textarea";
+  type: "text" | "textarea" | "number" | "date" | "select";
   placeholder?: string;
   required?: boolean;
-  options?: string[];
+  options?: { label: string; value: number }[];
 }

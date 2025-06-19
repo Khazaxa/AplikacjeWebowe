@@ -62,7 +62,8 @@ public sealed class Story : EntityBase
         builder.Entity<Story>()
             .HasMany(s => s.Tasks)
             .WithOne(t => t.Story)
-            .HasForeignKey(t => t.StoryId);
+            .HasForeignKey(t => t.StoryId)
+            .OnDelete(DeleteBehavior.Cascade);
         builder.Entity<Story>()
             .HasOne(s => s.Project)
             .WithMany(p => p.Stories)

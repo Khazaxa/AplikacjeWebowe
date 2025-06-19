@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Domain.Migrations
 {
     [DbContext(typeof(ManagMeDbContext))]
-    [Migration("20250619100634_MoreRelations1")]
-    partial class MoreRelations1
+    [Migration("20250619181320_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

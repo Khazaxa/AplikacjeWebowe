@@ -18,7 +18,6 @@ public class Task : EntityBase
         DateTime? estimatedCompletionDate,
         State? state,
         int? assignedToId,
-        DateTime? createdAt,
         int? reporterId)
     {
         Name = name;

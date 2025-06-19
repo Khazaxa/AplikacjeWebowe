@@ -50,4 +50,9 @@ public class TaskController(IMediator mediator) : ControllerBase
     [Route("/task/{id}/assign")]
     public async Task AssignTask(int id, int userId, CancellationToken cancellationToken)
         => await mediator.Send(new AssignTaskCommand(id, userId), cancellationToken);
+    
+    [HttpGet]
+    [Route("/story/{storyId}/tasks")]
+    public async Task<IQueryable<TaskDto>> GetTasksByStoryId(int storyId, CancellationToken cancellationToken)
+        => await mediator.Send(new GetTasksByStoryIdQuery(storyId), cancellationToken);
 }

@@ -8,8 +8,7 @@ public record TaskParams(
     Priority? Priority, 
     int? StoryId, 
     DateTime? EstimatedCompletionDate, 
-    State? State, 
-    DateTime? CreatedAt, 
+    State? State,
     DateTime? StartedAt, 
     DateTime? EndDate,
     int? AssignedToId);

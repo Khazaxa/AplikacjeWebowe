@@ -31,6 +31,7 @@ public class Project : EntityBase
         builder.Entity<Project>()
             .HasMany(p => p.Stories)
             .WithOne(s => s.Project)
-            .HasForeignKey(s => s.ProjectId);
+            .HasForeignKey(s => s.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

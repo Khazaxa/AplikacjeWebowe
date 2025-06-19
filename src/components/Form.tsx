@@ -25,7 +25,7 @@ export default function Form<T>({
 
     let newValue: any = value;
 
-    if (type === "number") newValue = Number(value);
+    if (type === "number" || type === "select") newValue = Number(value);
     else if (type === "date") newValue = new Date(value);
 
     setFormData((prev) => ({
@@ -84,9 +84,9 @@ export default function Form<T>({
               required={required}
             >
               <option value="">-- select --</option>
-              {options.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
+              {options.map(({ label, value }) => (
+                <option key={value} value={value}>
+                  {label}
                 </option>
               ))}
             </select>

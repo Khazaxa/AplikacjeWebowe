@@ -54,8 +54,8 @@ export default function ExpandableForm<T extends FormType>({
   return (
     <div
       className={`relative bg-gray-200 dark:bg-gray-900 px-3 py-1 flex flex-col items-center
-        transition-all duration-500 ease-in-out overflow-hidden shadow-lg
-        ${expanded ? "h-[400px] py-6" : "h-16 py-1"}`}
+    transition-all duration-500 ease-in-out overflow-auto shadow-lg
+    ${expanded ? "py-6" : "h-16 py-1"}`}
     >
       <img
         src={expandForm}

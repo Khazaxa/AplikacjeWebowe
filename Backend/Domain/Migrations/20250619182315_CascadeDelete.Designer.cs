@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Domain.Migrations
 {
     [DbContext(typeof(ManagMeDbContext))]
-    [Migration("20250619090711_MoreRelations")]
-    partial class MoreRelations
+    [Migration("20250619182315_CascadeDelete")]
+    partial class CascadeDelete
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -193,7 +193,8 @@ namespace Domain.Migrations
                 {
                     b.HasOne("Domain.Projects.Entities.Project", "Project")
                         .WithMany("Stories")
-                        .HasForeignKey("ProjectId");
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("Domain.Users.Entities.User", "User")
                         .WithMany("Stories")
@@ -216,7 +217,8 @@ namespace Domain.Migrations
 
                     b.HasOne("Domain.Stories.Entities.Story", "Story")
                         .WithMany("Tasks")
-                        .HasForeignKey("StoryId");
+                        .HasForeignKey("StoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Assigned");
 

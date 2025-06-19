@@ -35,4 +35,9 @@ public class StoryController(IMediator mediator) : ControllerBase
     [Route("/story/{id}")]
     public async Task DeleteStory(int id, CancellationToken cancellationToken)
         => await mediator.Send(new DeleteStoryCommand(id), cancellationToken);
+    
+    [HttpGet]
+    [Route("/project/{projectId}/stories")]
+    public async Task<IQueryable<StoryDto>> GetStoriesByProjectId(int projectId, CancellationToken cancellationToken)
+        => await mediator.Send(new GetStoriesByProjectIdQuery(projectId), cancellationToken);
 }
