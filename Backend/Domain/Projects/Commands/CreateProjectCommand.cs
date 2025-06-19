@@ -25,6 +25,7 @@ internal class CreateProjectCommandHandler(
         var project = new Project(
             request.Params.Name, 
             request.Params.Description);
+        
         projectRepository.Add(project);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

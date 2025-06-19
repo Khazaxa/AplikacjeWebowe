@@ -17,6 +17,10 @@ internal class UpdateStoryCommandHandler(
         var story = await storyRepository.FindAsync(request.Id, cancellationToken)
                   ?? throw new DomainException("Story not found.", (int)CommonErrorCode.InvalidOperation);
         
+        if(await storyRepository.AnyAsync(
+               s => s.Name == request.Params.Name, cancellationToken))
+            throw new DomainException("Story with this name already exists.", (int)CommonErrorCode.InvalidOperation);
+        
         story.Update(
             request.Params.Name,
             request.Params.Description,

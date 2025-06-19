@@ -3,6 +3,7 @@ using Core.Database;
 using Core.Middlewares;
 using Domain.Tasks.Dto;
 using Domain.Tasks.Repositories;
+using Domain.Users.Services;
 using Task = Domain.Tasks.Entities.Task;
 
 namespace Domain.Tasks.Commands;
@@ -10,6 +11,7 @@ namespace Domain.Tasks.Commands;
 public record CreateTaskCommand(TaskParams @Params) : ICommand<int>;
 
 internal class CreateTaskCommandHandler(
+    IUserContextService userContext,
     ITaskRepository taskRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateTaskCommand, int>
 {
@@ -29,8 +31,9 @@ internal class CreateTaskCommandHandler(
             request.Params.StoryId,
             request.Params.EstimatedCompletionDate,
             request.Params.State,
-            request.Params.UserId
-            );
+            request.Params.AssignedToId,
+            request.Params.CreatedAt,
+            userContext.GetUserId());
         
         taskRepository.Add(task);
         await unitOfWork.SaveChangesAsync(cancellationToken);

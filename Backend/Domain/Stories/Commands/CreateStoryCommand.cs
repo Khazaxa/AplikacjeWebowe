@@ -26,7 +26,8 @@ internal class CreateStoryCommandHandler(
             request.Params.Name,
             request.Params.Description,
             request.Params.Priority,
-            request.Params.State);
+            request.Params.State,
+            request.Params.ProjectId);
         
         storyRepository.Add(story);
         await unitOfWork.SaveChangesAsync(cancellationToken);

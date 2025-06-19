@@ -12,12 +12,14 @@ public class Task : EntityBase
     
     public Task(
         string name, 
-        string? description = null, 
-        Priority? priority = null, 
-        int? storyId = null, 
-        DateTime? estimatedCompletionDate = null, 
-        State? state = null, 
-        int? userId = null)
+        string? description,
+        Priority? priority, 
+        int? storyId,
+        DateTime? estimatedCompletionDate,
+        State? state,
+        int? assignedToId,
+        DateTime? createdAt,
+        int? reporterId)
     {
         Name = name;
         Description = description;
@@ -25,7 +27,8 @@ public class Task : EntityBase
         StoryId = storyId;
         EstimatedCompletionDate = estimatedCompletionDate;
         State = state;
-        UserId = userId;
+        AssignedToId = assignedToId;
+        ReporterId = reporterId;
     }
     
     public string? Name { get; private set; }
@@ -37,26 +40,46 @@ public class Task : EntityBase
     public State? State { get; private set; }
     public DateTime? CreatedAt { get; private set; } = DateTime.UtcNow;
     public DateTime? StartedAt { get; private set; }
-    public DateTime? EndDate { get; private set; } = DateTime.UtcNow;
-    public int? UserId { get; private set; }
-    public User? User { get; private set; }
+    public DateTime? EndDate { get; private set; }
+    public int? AssignedToId { get; private set; }
+    public User? Assigned { get; private set; }
+    public int? ReporterId { get; private set; }
+    public User? Reporter { get; private set; }
     
     public void Update(
-        string? name = null, 
-        string? description = null, 
-        Priority? priority = null, 
-        int? storyId = null, 
-        DateTime? estimatedCompletionDate = null, 
-        State? state = null, 
-        int? userId = null)
+        string? name,
+        string? description,
+        Priority? priority,
+        int? storyId,
+        DateTime? estimatedCompletionDate,
+        State? state,
+        int? assignedToId)
     {
-        Name = name ?? Name;
-        Description = description ?? Description;
-        Priority = priority ?? Priority;
-        StoryId = storyId ?? StoryId;
-        EstimatedCompletionDate = estimatedCompletionDate ?? EstimatedCompletionDate;
-        State = state ?? State;
-        UserId = userId ?? UserId;
+        Name = name;
+        Description = description;
+        Priority = priority;
+        StoryId = storyId;
+        EstimatedCompletionDate = estimatedCompletionDate;
+        State = state;
+        AssignedToId = assignedToId;
+    }
+    
+    public void Start(int? assignedToId)
+    {
+        StartedAt = DateTime.UtcNow;
+        State = Stories.Enums.State.InProgress;
+        AssignedToId = assignedToId;
+    }
+    
+    public void Complete()
+    {
+        EndDate = DateTime.UtcNow;
+        State = Stories.Enums.State.Done;
+    }
+    
+    public void Assign(int? assignedToId)
+    {
+        AssignedToId = assignedToId;
     }
     
     public static void OnModelCreating(ModelBuilder builder)
@@ -64,9 +87,13 @@ public class Task : EntityBase
         builder.Entity<Task>().HasKey(x => x.Id);
         builder.Entity<Task>().HasIndex(x => x.Name).IsUnique();
         builder.Entity<Task>()
-            .HasOne(t => t.User)
+            .HasOne(t => t.Assigned)
             .WithMany(u => u.Tasks)
-            .HasForeignKey(t => t.UserId);
+            .HasForeignKey(t => t.AssignedToId);
+        builder.Entity<Task>()
+            .HasOne(t => t.Reporter)
+            .WithMany(u => u.ReportedTasks)
+            .HasForeignKey(t => t.ReporterId);
         builder.Entity<Task>()
             .HasOne(t => t.Story)
             .WithMany(s => s.Tasks)

@@ -41,6 +41,7 @@ public sealed class User : EntityBase
     public string? Description { get; private set; }
     public List<Story>? Stories { get; private set; } = new ();
     public List<Task>? Tasks { get; private set; } = new ();
+    public List<Task>? ReportedTasks { get; private set; } = new ();
 
     
     public static void OnModelCreating(ModelBuilder builder)
@@ -53,7 +54,11 @@ public sealed class User : EntityBase
             .HasForeignKey(s => s.UserId);
         builder.Entity<User>()
             .HasMany(u => u.Tasks)
-            .WithOne(t => t.User)
-            .HasForeignKey(t => t.UserId);
+            .WithOne(t => t.Assigned)
+            .HasForeignKey(t => t.AssignedToId);
+        builder.Entity<User>()
+            .HasMany(u => u.ReportedTasks)
+            .WithOne(t => t.Reporter)
+            .HasForeignKey(t => t.ReporterId);
     }
 }

@@ -11,5 +11,5 @@ public record TaskParams(
     State? State, 
     DateTime? CreatedAt, 
     DateTime? StartedAt, 
-    DateTime? EndDate, 
-    int? UserId);
+    DateTime? EndDate,
+    int? AssignedToId);

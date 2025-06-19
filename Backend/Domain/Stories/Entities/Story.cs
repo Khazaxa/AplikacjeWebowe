@@ -1,4 +1,5 @@
 using Core.Database;
+using Domain.Projects.Entities;
 using Domain.Stories.Enums;
 using Domain.Users.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -10,12 +11,18 @@ public sealed class Story : EntityBase
 {
     private Story() { }
     
-    public Story(string name, string? description = null, Priority? priority = null, State? state = null)
+    public Story(
+        string name, 
+        string? description,
+        Priority? priority,
+        State? state,
+        int? projectId)
     {
         Name = name;
         Description = description;
         Priority = priority;
         State = state;
+        ProjectId = projectId;
     }
     
     public string? Name { get; private set; }
@@ -25,6 +32,8 @@ public sealed class Story : EntityBase
     public State? State { get; private set; }
     public int? UserId { get; private set; }
     public User? User { get; private set; }
+    public int? ProjectId { get; private set; }
+    public Project? Project { get; private set; }
     public List<Task>? Tasks { get; private set; } = new ();
     
     public void Update(
@@ -54,5 +63,9 @@ public sealed class Story : EntityBase
             .HasMany(s => s.Tasks)
             .WithOne(t => t.Story)
             .HasForeignKey(t => t.StoryId);
+        builder.Entity<Story>()
+            .HasOne(s => s.Project)
+            .WithMany(p => p.Stories)
+            .HasForeignKey(s => s.ProjectId);
     }
 }

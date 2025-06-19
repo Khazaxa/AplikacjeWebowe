@@ -15,4 +15,5 @@ public record TaskDto(
     DateTime? CreatedAt,
     DateTime? StartedAt,
     DateTime? EndDate,
-    int? UserId);
+    int? AssignedToId,
+    int? ReporterId);

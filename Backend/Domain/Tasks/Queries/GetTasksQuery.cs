@@ -26,7 +26,8 @@ internal class GetTasksQueryHandler(
                 t.CreatedAt,
                 t.StartedAt,
                 t.EndDate,
-                t.UserId
+                t.AssignedToId,
+                t.ReporterId
             ));
         
         return tasks.AsQueryable();

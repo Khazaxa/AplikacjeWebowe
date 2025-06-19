@@ -28,6 +28,7 @@ internal class GetTaskQueryHandler(
             task.CreatedAt,
             task.StartedAt,
             task.EndDate,
-            task.UserId);
+            task.AssignedToId,
+            task.ReporterId);
     }
 }
