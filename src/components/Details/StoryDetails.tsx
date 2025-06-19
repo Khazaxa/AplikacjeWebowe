@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ReturnBtn from "../Buttons/ReturnBtn";
 import ExpandableForm from "../ExpandableForm";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { TaskService } from "../../service/TaskService";
 import { StoryService } from "../../service/StoryService";
 import { Story } from "./ProjectDetails";
@@ -27,67 +27,50 @@ export default function StoryDetails() {
   const [story, setStory] = useState<Story | null>(null);
   const [loadingStory, setLoadingStory] = useState(false);
   const [storyError, setStoryError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [errorTasks, setErrorTasks] = useState<string | null>(null);
+  const [tasksError, setTasksError] = useState<string | null>(null);
 
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!storyId) return;
+    if (!storyError && !tasksError && !submitError) return;
+    const timer = setTimeout(() => {
+      setStoryError(null);
+      setTasksError(null);
+      setSubmitError(null);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [storyError, tasksError, submitError]);
 
+  useEffect(() => {
+    if (!storyId) return;
     fetchStory();
     fetchTasks();
   }, [storyId]);
 
-  useEffect(() => {
-    if (errorTasks) {
-      const timer = setTimeout(() => setErrorTasks(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [errorTasks]);
-
-  useEffect(() => {
-    if (submitError) {
-      const timer = setTimeout(() => setSubmitError(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [submitError]);
-
-  useEffect(() => {
-    if (storyError) {
-      const timer = setTimeout(() => setStoryError(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [storyError]);
-
-  async function fetchTasks() {
-    if (!storyId) return;
-
-    setErrorTasks(null);
-
-    try {
-      const res = await TaskService.getByStoryId(storyId);
-      setTasks(res.data);
-    } catch {
-      setErrorTasks("Failed to load tasks.");
-    }
-  }
-
   async function fetchStory() {
-    if (!storyId) return;
-
     setLoadingStory(true);
     setStoryError(null);
-
     try {
-      const res = await StoryService.getById(storyId);
+      const res = await StoryService.getById(storyId!);
       setStory(res.data);
     } catch {
       setStoryError("Failed to load story details.");
     } finally {
       setLoadingStory(false);
+    }
+  }
+
+  async function fetchTasks() {
+    setTasksError(null);
+    try {
+      const res = await TaskService.getByStoryId(storyId!);
+      setTasks(res.data);
+    } catch {
+      setTasksError("Failed to load tasks.");
     }
   }
 
@@ -102,7 +85,10 @@ export default function StoryDetails() {
       ...data,
       priority: Number(data.priority),
       state: Number(data.state),
-      assignedToId: data.assignedToId ? Number(data.assignedToId) : null,
+      assignedToId:
+        data.assignedToId !== null && data.assignedToId !== undefined
+          ? Number(data.assignedToId)
+          : null,
       storyId: storyId ? Number(storyId) : 0,
     };
   }
@@ -115,8 +101,8 @@ export default function StoryDetails() {
     }
 
     try {
-      const transformedData = transformTaskData(data);
-      await TaskService.create(transformedData);
+      const transformed = transformTaskData(data);
+      await TaskService.create(transformed);
       await fetchTasks();
     } catch {
       setSubmitError("Failed to add task.");
@@ -125,10 +111,9 @@ export default function StoryDetails() {
 
   const handleEditSubmit = async (data: Omit<Task, "id">) => {
     if (!editingTask) return;
-
     try {
-      const transformedData = transformTaskData(data);
-      await TaskService.update(editingTask.id.toString(), transformedData);
+      const transformed = transformTaskData(data);
+      await TaskService.update(editingTask.id.toString(), transformed);
       await fetchTasks();
       setEditingTask(null);
     } catch {
@@ -153,7 +138,7 @@ export default function StoryDetails() {
       await TaskService.delete(id.toString());
       await fetchTasks();
     } catch {
-      setErrorTasks("Failed to delete task.");
+      setTasksError("Failed to delete task.");
     }
   };
 
@@ -165,7 +150,33 @@ export default function StoryDetails() {
       await TaskService.update(taskId.toString(), { ...task, state: newState });
       await fetchTasks();
     } catch {
-      setErrorTasks("Failed to update task state.");
+      setTasksError("Failed to update task state.");
+    }
+  }
+
+  function priorityToString(priority: number): string {
+    switch (priority) {
+      case 0:
+        return "Low";
+      case 1:
+        return "Medium";
+      case 2:
+        return "High";
+      default:
+        return "Unknown";
+    }
+  }
+
+  function stateToString(state: number): string {
+    switch (state) {
+      case 0:
+        return "To Do";
+      case 1:
+        return "In Progress";
+      case 2:
+        return "Done";
+      default:
+        return "Unknown";
     }
   }
 
@@ -178,55 +189,88 @@ export default function StoryDetails() {
         initialData={editingTask ?? undefined}
       />
 
-      <div className="flex flex-col items-center justify-start p-4 space-y-4 w-full max-w-3xl mx-auto">
+      <div className="relative min-h-screen flex flex-col items-center justify-start bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 pt-6 px-6 transition-all duration-500 ease-in-out">
         <ReturnBtn />
-
-        <div className="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-6 py-4 rounded shadow w-full max-w-xl text-center">
-          {loadingStory && <p>Loading story...</p>}
-
-          {story && (
-            <>
-              <p className="text-2xl font-bold text-indigo-600">{story.name}</p>
-              <p className="text-base mt-2 text-gray-700 dark:text-gray-300">
-                {story.description}
+        <div className="bg-white dark:bg-gray-800 bg-opacity-80 dark:bg-opacity-70 rounded-lg p-6 max-w-4xl shadow-md text-center overflow-hidden transition-all duration-500 ease-in-out flex flex-col gap-6">
+          <section>
+            {loadingStory && (
+              <p className="text-lg text-gray-500 dark:text-gray-400">
+                Loading story...
               </p>
-              <p className="text-sm mt-2">Priority: {story.priority}</p>
-              <p className="text-sm mt-1">State: {story.state}</p>
-            </>
-          )}
+            )}
 
-          {storyError && (
-            <Notifications messageType="error" message={storyError} />
-          )}
-          {submitError && (
-            <Notifications messageType="error" message={submitError} />
-          )}
-          {errorTasks && (
-            <Notifications messageType="error" message={errorTasks} />
+            {story && (
+              <>
+                <h1 className="text-3xl font-extrabold text-indigo-600 mb-2">
+                  {story.name}
+                </h1>
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  {story.description}
+                </p>
+                <div className="flex justify-center gap-8 text-sm font-medium text-gray-600 dark:text-gray-400">
+                  <p>
+                    <span className="font-semibold">Priority:</span>{" "}
+                    {priorityToString(story.priority)}
+                  </p>
+                  <p>
+                    <span className="font-semibold">State:</span>{" "}
+                    {stateToString(story.state)}
+                  </p>
+                </div>
+              </>
+            )}
+
+            {(storyError || submitError || tasksError) && (
+              <>
+                {storyError && (
+                  <Notifications messageType="error" message={storyError} />
+                )}
+                {submitError && (
+                  <Notifications messageType="error" message={submitError} />
+                )}
+                {tasksError && (
+                  <Notifications messageType="error" message={tasksError} />
+                )}
+              </>
+            )}
+          </section>
+
+          {tasks.length > 0 ? (
+            <>
+              <KanbanBoard
+                tasks={tasks.filter((task) => [0, 1, 2].includes(task.state))}
+                onStatusChange={handleStatusChange}
+                onEditTask={(id) => {
+                  const task = tasks.find((t) => t.id === id);
+                  if (task) setEditingTask(task);
+                }}
+                onViewTaskDetails={(id) => {
+                  navigate(`/task/${id}`);
+                }}
+                onDeleteTask={handleDeleteTask}
+              />
+
+              {tasks.some((task) => ![0, 1, 2].includes(task.state)) && (
+                <List
+                  title="Tasks outside Kanban"
+                  items={tasks.filter(
+                    (task) => ![0, 1, 2].includes(task.state)
+                  )}
+                  itemType="task"
+                  onEdit={(id) => {
+                    const taskToEdit = tasks.find((t) => t.id === id);
+                    if (taskToEdit) setEditingTask(taskToEdit);
+                  }}
+                  onDelete={handleDeleteTask}
+                />
+              )}
+            </>
+          ) : (
+            <p className="text-center text-gray-500 dark:text-gray-400 mt-10">
+              No tasks yet. Add one above to get started!
+            </p>
           )}
         </div>
-
-        {tasks.length > 0 && (
-          <>
-            <KanbanBoard
-              tasks={tasks.filter((task) => [0, 1, 2].includes(task.state))}
-              onStatusChange={handleStatusChange}
-            />
-
-            {tasks.some((task) => ![0, 1, 2].includes(task.state)) && (
-              <List
-                title="Tasks outside Kanban"
-                items={tasks.filter((task) => ![0, 1, 2].includes(task.state))}
-                itemType="task"
-                onEdit={(id) => {
-                  const taskToEdit = tasks.find((t) => t.id === id);
-                  if (taskToEdit) setEditingTask(taskToEdit);
-                }}
-                onDelete={handleDeleteTask}
-              />
-            )}
-          </>
-        )}
       </div>
     </>
   );
