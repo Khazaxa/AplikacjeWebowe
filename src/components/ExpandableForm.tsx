@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import expandForm from "../assets/expand.svg";
 import Form from "./Form";
 import { projectFields } from "../models/ProjectParams";
@@ -19,21 +19,37 @@ const fieldsMap: Record<FormType, Field[]> = {
 interface ExpandableFormProps<T extends FormType> {
   formType: T;
   onSubmit?: (data: any) => void;
+  onCollapse?: () => void;
+  initialData?: Record<string, any>;
 }
 
 export default function ExpandableForm<T extends FormType>({
   formType,
   onSubmit,
+  onCollapse,
+  initialData,
 }: ExpandableFormProps<T>) {
   const [expanded, setExpanded] = useState(false);
   const fields = fieldsMap[formType];
 
-  const toggleExpand = () => setExpanded((prev) => !prev);
+  const toggleExpand = () => {
+    setExpanded((prev) => {
+      const next = !prev;
+      if (!next) {
+        onCollapse?.();
+      }
+      return next;
+    });
+  };
 
   const handleSubmit = (data: any) => {
     onSubmit?.(data);
     setExpanded(false);
   };
+
+  useEffect(() => {
+    if (initialData) setExpanded(true);
+  }, [initialData]);
 
   return (
     <div
@@ -55,7 +71,18 @@ export default function ExpandableForm<T extends FormType>({
             Click the icon to add {formType}
           </h2>
         )}
-        {expanded && <Form fields={fields} onSubmit={handleSubmit} />}
+        {expanded && (
+          <>
+            {initialData && (
+              <h2 className="text-lg font-medium text-blue-500 mb-2">Edit</h2>
+            )}
+            <Form
+              fields={fields}
+              onSubmit={handleSubmit}
+              initialData={initialData}
+            />
+          </>
+        )}
       </div>
     </div>
   );
