@@ -1,34 +1,17 @@
-export default function AddBtn({
-  onClick,
-  disabled = false,
-}: {
-  onClick: () => void;
-  disabled?: boolean;
-}) {
+type AddBtnProps = {
+  disabled: boolean;
+};
+
+export default function AddBtn({ disabled }: AddBtnProps) {
   return (
     <button
-      className={`
-        px-6 py-2
-        rounded-lg
-        bg-green-500
-        hover:bg-green-600
-        text-white
-        font-semibold
-        shadow-md
-        transition
-        duration-200
-        ease-in-out
-        disabled:bg-gray-300
-        disabled:cursor-not-allowed
-        focus:outline-none
-        focus:ring-2
-        focus:ring-green-400
-        focus:ring-offset-2
-      `}
-      onClick={onClick}
+      type="submit"
       disabled={disabled}
+      className={`px-4 py-2 bg-blue-600 text-white rounded transition
+        ${disabled ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"}
+      `}
     >
-      Save changes
+      Add
     </button>
   );
 }
