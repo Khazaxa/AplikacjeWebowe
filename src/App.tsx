@@ -1,34 +1,28 @@
-import { useState } from "react";
+import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import HomePage from "./pages/HomePage";
-import ProjectPage from "./pages/ProjectPage";
-import StoryDetails from "./components/StoryDetails";
-import { Register } from "./components/Register";
-import { Login } from "./components/Login";
+import Home from "./components/Pages/Home";
+import AuthPage from "./components/AuthPage";
+import LoggedUser from "./components/LoggedUser";
+import ProjectDetails from "./components/Details/ProjectDetails";
+import StoryDetails from "./components/Details/StoryDetails";
+import TaskDetails from "./components/Details/TaskDetails";
 
 function App() {
-  const [register, setRegister] = useState(true);
-
   return (
-    <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            register ? (
-              <Login setRegister={setRegister} />
-            ) : (
-              <Register setRegister={setRegister} />
-            )
-          }
-        />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/project/:id" element={<ProjectPage />} />
-        <Route path="/story/:id" element={<StoryDetails />} />
-        <Route path="*" element={<div>404 Not Found</div>} />
-      </Routes>
-    </Router>
+    <>
+      <LoggedUser />
+      <Router>
+        <Routes>
+          <Route path="/" element={<AuthPage />} />
+          <Route path="/projects" element={<Home />} />
+          <Route path="/project/:id" element={<ProjectDetails />} />
+          <Route path="/story/:id" element={<StoryDetails />} />
+          <Route path="/task/:id" element={<TaskDetails />} />
+          <Route path="*" element={<div>404 Not Found</div>} />
+        </Routes>
+      </Router>
+    </>
   );
 }
 

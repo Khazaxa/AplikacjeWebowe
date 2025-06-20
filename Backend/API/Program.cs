@@ -75,7 +75,22 @@ public class Program
             };
         });
 
-        builder.Services.AddCors();
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowLocalhost5173", policy =>
+            {
+                policy.WithOrigins("http://localhost:5173")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+            
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
         builder.Services.AddControllers();
         var app = builder.Build();
         
@@ -91,6 +106,7 @@ public class Program
             });
         }
 
+        app.UseCors("AllowAll");
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.MapControllers();

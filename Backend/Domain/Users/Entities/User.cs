@@ -1,10 +1,12 @@
 using Core.Database;
+using Domain.Stories.Entities;
 using Microsoft.EntityFrameworkCore;
 using Domain.Users.Enums;
+using Task = Domain.Tasks.Entities.Task;
 
 namespace Domain.Users.Entities;
 
-public class User : EntityBase
+public sealed class User : EntityBase
 {
     private User() { }
 
@@ -37,11 +39,26 @@ public class User : EntityBase
     public string? Surname { get; private set; }
     public int? Age { get; private set; }
     public string? Description { get; private set; }
+    public List<Story>? Stories { get; private set; } = new ();
+    public List<Task>? Tasks { get; private set; } = new ();
+    public List<Task>? ReportedTasks { get; private set; } = new ();
 
     
     public static void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<User>().HasKey(x => x.Id);
         builder.Entity<User>().HasIndex(x => x.Email).IsUnique();
+        builder.Entity<User>()
+            .HasMany(u => u.Stories)
+            .WithOne(s => s.User)
+            .HasForeignKey(s => s.UserId);
+        builder.Entity<User>()
+            .HasMany(u => u.Tasks)
+            .WithOne(t => t.Assigned)
+            .HasForeignKey(t => t.AssignedToId);
+        builder.Entity<User>()
+            .HasMany(u => u.ReportedTasks)
+            .WithOne(t => t.Reporter)
+            .HasForeignKey(t => t.ReporterId);
     }
 }

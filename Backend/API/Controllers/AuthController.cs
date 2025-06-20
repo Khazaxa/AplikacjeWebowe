@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 [Route("auth")]
 public class AuthController(IMediator mediator) : ControllerBase
