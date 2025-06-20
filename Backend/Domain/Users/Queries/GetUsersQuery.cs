@@ -1,5 +1,6 @@
 using Core.CQRS;
 using Domain.Users.Dtos;
+using Domain.Users.Enums;
 using Domain.Users.Repositories;
 
 namespace Domain.Users.Queries;
@@ -11,7 +12,8 @@ internal class GetUsersQueryHandler(
 {
     public async Task<IQueryable<UserDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
-        var users = userRepository.Query();
+        var users = userRepository.Query()
+            .Where(u => u.Role == UserRole.Dev || u.Role == UserRole.Devops);
         return users.Select(user => new UserDto(
             user.Id,
             user.Email,
