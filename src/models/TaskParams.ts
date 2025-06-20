@@ -45,6 +45,7 @@ export const taskFields: Field[] = [
   {
     name: "assignedToId",
     label: "Assigned To",
-    type: "text",
+    type: "select",
+    options: [],
   },
 ];

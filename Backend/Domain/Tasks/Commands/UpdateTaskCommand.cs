@@ -17,10 +17,6 @@ internal class UpdateTaskCommandHandler(
         var task = await taskRepository.FindAsync(request.Id, cancellationToken)
             ?? throw new DomainException("Task not found.", (int)CommonErrorCode.InvalidOperation);
         
-        if(await taskRepository.AnyAsync(
-               s => s.Name == request.Params.Name, cancellationToken))
-            throw new DomainException("Task with this name already exists.", (int)CommonErrorCode.InvalidOperation);
-        
         task.Update(
             request.Params.Name,
             request.Params.Description,

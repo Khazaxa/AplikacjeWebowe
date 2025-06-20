@@ -6,6 +6,7 @@ import { registerFields } from "../models/RegisterParams";
 import { storyFields } from "../models/StoryParams";
 import { taskFields } from "../models/TaskParams";
 import { Field } from "../models/IField";
+import { UserService } from "../service/UserService";
 
 export type FormType = "project" | "user" | "story" | "task";
 
@@ -30,7 +31,32 @@ export default function ExpandableForm<T extends FormType>({
   initialData,
 }: ExpandableFormProps<T>) {
   const [expanded, setExpanded] = useState(false);
-  const fields = fieldsMap[formType];
+  const [userOptions, setUserOptions] = useState<
+    { label: string; value: number }[]
+  >([]);
+
+  useEffect(() => {
+    if (formType === "task") {
+      UserService.getAll().then((res) => {
+        const options = res.data.map((user: any) => ({
+          label: user.email,
+          value: user.id,
+        }));
+        setUserOptions(options);
+      });
+    }
+  }, [formType]);
+
+  const baseFields = fieldsMap[formType];
+
+  const fields =
+    formType === "task"
+      ? baseFields.map((f) =>
+          f.name === "assignedToId"
+            ? { ...f, type: "select" as const, options: userOptions }
+            : f
+        )
+      : baseFields;
 
   const toggleExpand = () => {
     setExpanded((prev) => {
@@ -54,8 +80,8 @@ export default function ExpandableForm<T extends FormType>({
   return (
     <div
       className={`relative bg-gray-200 dark:bg-gray-900 px-3 py-1 flex flex-col items-center
-    transition-all duration-500 ease-in-out overflow-auto shadow-lg
-    ${expanded ? "py-6" : "h-16 py-1"}`}
+      transition-all duration-500 ease-in-out overflow-auto shadow-lg
+      ${expanded ? "py-6" : "h-16 py-1"}`}
     >
       <img
         src={expandForm}
@@ -80,6 +106,7 @@ export default function ExpandableForm<T extends FormType>({
               fields={fields}
               onSubmit={handleSubmit}
               initialData={initialData}
+              onClear={() => setExpanded(false)}
             />
           </>
         )}

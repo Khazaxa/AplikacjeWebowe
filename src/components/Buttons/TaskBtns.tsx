@@ -11,7 +11,6 @@ interface AssignBtnProps extends BtnProps {
   userId: string;
 }
 
-// Custom hook do obsługi powiadomień i ładowania
 function useNotification() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string>("");
@@ -19,7 +18,6 @@ function useNotification() {
     "success" | "error" | "warning" | null
   >(null);
 
-  // Automatyczne czyszczenie komunikatu po 3 sekundach
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => {
@@ -149,7 +147,7 @@ export function AssignBtn({ taskId, userId, onSuccess }: AssignBtnProps) {
           disabled:bg-orange-300 disabled:cursor-not-allowed
           focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2
         "
-        aria-label="Assign Task"
+        aria-label="Assign To Me"
       >
         {loading ? "Assigning..." : "Assign"}
       </button>

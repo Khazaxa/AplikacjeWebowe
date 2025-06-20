@@ -18,7 +18,6 @@ const columns = [
     title: "In Progress",
     bgColor: "bg-yellow-50 dark:bg-yellow-900",
   },
-  { id: "Done", title: "Done", bgColor: "bg-green-50 dark:bg-green-900" },
 ];
 
 function Column({
@@ -71,6 +70,18 @@ function TaskCard({
   );
 }
 
+const stateToColumnId = (state: number | string): string => {
+  const s = Number(state);
+  switch (s) {
+    case 1:
+      return "ToDo";
+    case 2:
+      return "InProgress";
+    default:
+      return "ToDo";
+  }
+};
+
 export default function KanbanView({
   tasks,
   onEditTask,
@@ -84,31 +95,21 @@ export default function KanbanView({
     onDeleteTask(taskId);
   };
 
-  const stateToColumnId = (state: number): string => {
-    switch (state) {
-      case 1:
-        return "ToDo";
-      case 2:
-        return "InProgress";
-      case 3:
-        return "Done";
-      default:
-        return "ToDo";
-    }
-  };
-
   return (
-    <div className="flex flex-col md:flex-row gap-4 mt-6">
-      {columns.map((col) => (
-        <Column
-          key={col.id}
-          columnId={col.id}
-          title={col.title}
-          bgColor={col.bgColor}
-        >
-          {tasks
-            .filter((task) => stateToColumnId(task.state) === col.id)
-            .map((task) => (
+    <div className="flex flex-col md:flex-row gap-4 mt-6 justify-center">
+      {columns.map((col) => {
+        const filteredTasks = tasks.filter(
+          (task) => stateToColumnId(task.state) === col.id
+        );
+
+        return (
+          <Column
+            key={col.id}
+            columnId={col.id}
+            title={col.title}
+            bgColor={col.bgColor}
+          >
+            {filteredTasks.map((task) => (
               <TaskCard
                 key={task.id}
                 task={task}
@@ -116,8 +117,9 @@ export default function KanbanView({
                 onDelete={handleDelete}
               />
             ))}
-        </Column>
-      ))}
+          </Column>
+        );
+      })}
     </div>
   );
 }
