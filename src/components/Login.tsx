@@ -78,6 +78,7 @@ export function Login({
           <input
             type="text"
             placeholder="Email"
+            data-test="email-input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -87,6 +88,7 @@ export function Login({
           <input
             type={passwordVisible ? "text" : "password"}
             placeholder="Password"
+            data-test="password-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -105,6 +107,7 @@ export function Login({
 
           <button
             type="submit"
+            data-test="login-btn"
             className="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md shadow transition duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             Login

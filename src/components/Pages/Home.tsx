@@ -114,14 +114,13 @@ export default function Home() {
 
           {!loading && !error && (
             <List
+              data-test="project-list"
               itemType="project"
               items={projects}
               title="Projects"
               onEdit={(id) => {
                 const projectToEdit = projects.find((p) => p.id === id);
-                if (projectToEdit) {
-                  setEditingProject(projectToEdit);
-                }
+                if (projectToEdit) setEditingProject(projectToEdit);
               }}
               onDelete={handleDeleteProject}
             />

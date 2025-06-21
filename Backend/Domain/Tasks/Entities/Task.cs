@@ -84,7 +84,7 @@ public class Task : EntityBase
     public static void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<Task>().HasKey(x => x.Id);
-        builder.Entity<Task>().HasIndex(x => x.Name).IsUnique();
+        builder.Entity<Task>().HasIndex(x => x.Name);
         builder.Entity<Task>()
             .HasOne(t => t.Assigned)
             .WithMany(u => u.Tasks)

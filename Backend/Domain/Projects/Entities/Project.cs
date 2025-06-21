@@ -27,7 +27,7 @@ public class Project : EntityBase
     public static void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<Project>().HasKey(x => x.Id);
-        builder.Entity<Project>().HasIndex(x => x.Name).IsUnique();
+        builder.Entity<Project>().HasIndex(x => x.Name);
         builder.Entity<Project>()
             .HasMany(p => p.Stories)
             .WithOne(s => s.Project)

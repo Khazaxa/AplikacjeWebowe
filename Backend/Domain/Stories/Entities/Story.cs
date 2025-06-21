@@ -54,7 +54,7 @@ public sealed class Story : EntityBase
     public static void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<Story>().HasKey(x => x.Id);
-        builder.Entity<Story>().HasIndex(x => x.Name).IsUnique();
+        builder.Entity<Story>().HasIndex(x => x.Name);
         builder.Entity<Story>()
             .HasOne(s => s.User)
             .WithMany(u => u.Stories)

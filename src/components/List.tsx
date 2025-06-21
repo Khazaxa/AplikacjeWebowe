@@ -18,6 +18,7 @@ interface ListProps {
   itemType: "project" | "story" | "task";
   onEdit?: (id: number) => void;
   onDelete?: (id: number) => void;
+  "data-test"?: string;
 }
 
 function stateToString(state: string | number | undefined): string {
@@ -51,17 +52,21 @@ export default function List({
   itemType,
   onEdit,
   onDelete,
+  "data-test": dataTestId = "list",
 }: ListProps) {
   const navigate = useNavigate();
+  const sortedItems = sortItemsByState(items);
 
   const handleDetailsClick = (id: number) => {
     navigate(`/${itemType}/${id}`);
   };
 
-  const sortedItems = sortItemsByState(items);
-
   return (
-    <div className="flex flex-col items-center justify-start p-4 space-y-2 w-full max-w-3xl mx-auto">
+    <div
+      className="flex flex-col items-center justify-start p-4 space-y-2 w-full max-w-3xl mx-auto"
+      data-testid={dataTestId}
+      data-test={dataTestId}
+    >
       {title && (
         <h2 className="text-2xl font-bold text-gray-200 mb-4">{title}</h2>
       )}
@@ -74,19 +79,22 @@ export default function List({
           return (
             <div
               key={id}
-              className={`text-gray-100 px-6 py-4 rounded shadow cursor-pointer text-sm font-medium w-full max-w-md flex flex-col items-center ${
+              className={`text-gray-100 px-6 py-4 rounded shadow text-sm font-medium w-full max-w-md flex flex-col items-center ${
                 isDone ? "bg-green-600" : "bg-gray-700"
               }`}
+              data-testid={`list-item-${id}`}
             >
               <span className="text-center mb-1 w-full">{name}</span>
               <span className="text-center mb-3 w-full italic text-sm">
-                Status: {statusText}
+                {state !== undefined ? `Status: ${statusText}` : ""}
               </span>
 
               <div className="flex gap-3 mt-2.5">
                 <DetailsBtn onClick={() => handleDetailsClick(id)} />
-                <EditBtn onClick={() => onEdit && onEdit(id)} />
-                <DelBtn onClick={() => onDelete && onDelete(id)} />
+                {onEdit && (
+                  <EditBtn data-test="edit-btn" onClick={() => onEdit(id)} />
+                )}
+                {onDelete && <DelBtn onClick={() => onDelete(id)} />}
               </div>
             </div>
           );

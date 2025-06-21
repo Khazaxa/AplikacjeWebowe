@@ -84,6 +84,7 @@ export default function ExpandableForm<T extends FormType>({
       ${expanded ? "py-6" : "h-16 py-1"}`}
     >
       <img
+        data-test="expand-form-btn"
         src={expandForm}
         alt="Expand form"
         onClick={toggleExpand}
